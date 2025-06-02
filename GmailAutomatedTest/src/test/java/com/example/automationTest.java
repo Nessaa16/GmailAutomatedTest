@@ -15,10 +15,8 @@ public class automationTest {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("start-maximized");
-        options.addArguments("disable-infobars");
         options.addArguments("--disable-notifications");
         options.addArguments("--disable-popup-blocking");
-        options.addArguments("--disable-blink-features=AutomationControlled");
         options.addArguments("--disable-features=ProtocolHandler");
 
         System.setProperty("webdriver.chrome.driver", "C:\\WebDrivers\\chromedriver.exe");
@@ -44,9 +42,6 @@ public class automationTest {
             WebElement passwordNext = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Next']")));
             passwordNext.click();
 
-            System.out.println("If OTP is required, enter it manually. Press Enter to continue...");
-            new Scanner(System.in).nextLine();
-
             wait.until(ExpectedConditions.titleContains("Inbox"));
             System.out.println("Login successful!");
 
@@ -65,7 +60,7 @@ public class automationTest {
                 System.out.println("Popup not found" + e.getMessage());
             }
 
-            Thread.sleep(3000); // Allow emails to load
+            Thread.sleep(3000);
             String subject = findAndDeleteLatestUnreadEmail(driver, wait);
             if (subject != null) {
                 System.out.println("Deleted email with subject: " + subject);
