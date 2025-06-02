@@ -5,14 +5,20 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.annotations.*;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Scanner;
 
 public class automationTest {
-    public static void main(String[] args) {
 
+    private WebDriver driver;
+    private WebDriverWait wait;
+
+    @BeforeMethod
+    public void setUp() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("start-maximized");
         options.addArguments("--disable-notifications");
@@ -21,9 +27,12 @@ public class automationTest {
 
         System.setProperty("webdriver.chrome.driver", "C:\\WebDrivers\\chromedriver.exe");
 
-        WebDriver driver = new ChromeDriver(options);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    }
 
+    @Test
+    public void testGmailEmailDeletion() {
         try {
             driver.get("https://mail.google.com/");
 
@@ -45,7 +54,7 @@ public class automationTest {
             wait.until(ExpectedConditions.titleContains("Inbox"));
             System.out.println("Login successful!");
 
-            Thread.sleep(4000);
+            Thread.sleep(3000);
 
             //dismiss pop up
             try {
@@ -62,15 +71,14 @@ public class automationTest {
 
             Thread.sleep(3000);
             String subject = findAndDeleteLatestUnreadEmail(driver, wait);
-            if (subject != null) {
-                System.out.println("Deleted email with subject: " + subject);
-            }
+
+            Assert.assertNotNull(subject, "Email deletion should return a subject");
+            System.out.println("Deleted email with subject: " + subject);
 
         } catch (Exception e) {
             System.out.println("An error occurred: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            driver.quit();
+            Assert.fail("Test failed: " + e.getMessage());
         }
     }
 
@@ -86,7 +94,7 @@ public class automationTest {
             String subject;
 
             try {
-                WebElement subjectElement = latestUnread.findElement(By.cssSelector("span[data-thread-id] span"));
+                WebElement subjectElement = latestUnread.findElement(By.cssSelector("span.bog span"));
                 subject = subjectElement.getText().trim();
             } catch (Exception e) {
                 subject = "Unknown Subject";
@@ -119,6 +127,13 @@ public class automationTest {
         } catch (Exception e) {
             System.out.println("Error deleting email: " + e.getMessage());
             return null;
+        }
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
         }
     }
 }
